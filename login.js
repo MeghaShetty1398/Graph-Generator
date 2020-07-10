@@ -30,18 +30,22 @@ app.post('/register-user', function(request, response) {
 	var email = request.body.email;
 	var username = request.body.username;
 	var password = request.body.password;
+	var cpassword = request.body.cpassword;
 	var  sql = "SELECT USERNAME FROM USERS WHERE username = '"+username+"'";
 	connection.query(sql, function (err, results,fields) {  
 		if (results.length > 0) {
 			
 			response.send("Username already exists.");
-		} else {
+		} 
+		else if(password!==cpassword)
+		{	response.send("Passwords do not match.");}
+		else {
 			sql = "INSERT INTO users (EMAIL,USERNAME,PASSWORD) VALUES ('"+email+"','"+username+"','"+password+"')";  
 			connection.query(sql, function (err, result) {  
 			if (err) throw err;  
 			console.log("1 record inserted");  
-			response.sendFile(path.join(__dirname + '/login.html'));
 			});  
+			response.redirect('/login');
 		}
 		response.end();
 		});  
@@ -50,6 +54,9 @@ app.post('/register-user', function(request, response) {
 });
 app.get('/login', function(request, response) {
 	response.sendFile(path.join(__dirname + '/login.html'));
+});
+app.get('/mycss', function(request, response) {
+	response.sendFile(path.join(__dirname + '/login.css'));
 });
 app.post('/auth', function(request, response) {
 	var username = request.body.username;
