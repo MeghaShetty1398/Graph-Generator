@@ -28,6 +28,7 @@
 			padding: 20px 0 20px 0;
 		}
 		.login-form input[type="password"],
+        .login-form input[type="email"],
 		.login-form input[type="text"] {
 			width: 100%;
 			padding: 15px;
@@ -52,14 +53,16 @@
         </head>
 	    <body class="login-form" style="background: url('graph1.jpg');">
 	
-            <div class="card" style="width: 30%;height: 50%;margin-left: 35%;margin-top: 10%;background-color:#ffe6f0;">
-                <div class="card-header" style="background-color:#cc0066;"><h1>LOGIN FORM</h1></div>
+            <div class="card" style="width: 30%;height: 50%;margin-left: 35%;margin-top: 5%;background-color: #ffe6f0;">
+                <div class="card-header" style="background-color: #cc0066;"><h1>REGISTRATION FORM</h1></div>
                 <div class="card-body">
-                    <form action="auth" method="POST">
+                    <form action="register-user" method="POST">
+                        <input type="email" name="email" placeholder="Email" required>
 				        <input type="text" name="username" placeholder="Username" required>
-				        <input type="password" name="password" placeholder="Password" required>
-						<input type="submit" value="LOGIN">
-						<p><a href="#" >Forget Password?</a></p>
+                        <input type="password" name="password" placeholder="Password" required>
+                        <input type="password" name="cpassword" placeholder="Confirm Password" required>
+						<input type="submit" value="REGISTER">
+						<p>Already registered?&nbsp;<a method="POST" href="http://localhost:3000/login" >Sign in</a></p>
 			        </form>
                 </div> 
               </div>
