@@ -23,6 +23,9 @@ app.use(bodyParser.json());
 app.get('/', function(request, response) {
 	response.sendFile(path.join(__dirname + '/register.html'));
 });
+app.get('/forgot-password', function(request, response) {
+	response.sendFile(path.join(__dirname + '/forgot-password.html'));
+});
 app.post('/register-user', function(request, response) {
 	var email = request.body.email;
 	var username = request.body.username;
