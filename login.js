@@ -53,19 +53,13 @@ app.post('/update-password', function(request, response) {
 			email=results[0].email;
 			var  sql = "UPDATE USERS set PASSWORD='"+password+"' where EMAIL='"+email+"'";
 			connection.query(sql, function (err, results,fields) {  
-			if (results.length > 0) {
-				email=results[0].email;
-			} 
-			else {
-				response.send("Incorrect OTP.");
-			}
-			response.end();
+				response.redirect('/login');
 			});  
 		} 
 		else {
-			response.send("Incorrect OTP.");
+			response.end("Incorrect OTP");
 		}
-		response.end();
+		
 	});  
 });
 app.post('/reset-password', function(request, response) {
@@ -111,22 +105,20 @@ app.post('/register-user', function(request, response) {
 	connection.query(sql, function (err, results,fields) {  
 		if (results.length > 0) {
 			//return response.render('',{message:'Username already exists.'});
-			response.send("Username already exists.");
+			response.end("Username already exists.");
 		} 
 		else if(password!==cpassword)
-		{	response.send("Passwords do not match.");}
+		{	response.end("Passwords do not match.");}
 		else {
 			sql = "INSERT INTO users (EMAIL,USERNAME,PASSWORD) VALUES ('"+email+"','"+username+"','"+password+"')";  
 			connection.query(sql, function (err, result) {  
 			if (err) throw err;  
 			console.log("1 record inserted");  
-			});  
 			response.redirect('/login');
+			});  
 		}
-		response.end();
-		});  
-	
-	response.sendFile(path.join(__dirname + '/login.html'));
+	});  
+	//response.sendFile(path.join(__dirname + '/login.html'));
 });
 app.get('/login', function(request, response) {
 	response.sendFile(path.join(__dirname + '/login.html'));
