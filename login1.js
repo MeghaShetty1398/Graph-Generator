@@ -6,13 +6,36 @@ var path = require('path');
 var nodemailer = require('nodemailer');
 //var async = require('async');
 var crypto = require('crypto');
-const { fileLoader } = require('ejs');
 var connection = mysql.createConnection({
 	host     : 'localhost',
 	user     : 'root',
 	password : '',
 	database : 'nodelogin'
 });
+
+var  hbs = require('nodemailer-express-handlebars'),
+  email = process.env.MAILER_EMAIL_ID || 'graphgenerator2020@gmail.com',
+  pass = process.env.MAILER_PASSWORD || 'generator@2020'
+  nodemailer = require('nodemailer');
+
+var smtpTransport = nodemailer.createTransport({
+  service: process.env.MAILER_SERVICE_PROVIDER || 'Gmail',
+  auth: {
+    user: email,
+    pass: pass
+  }
+});
+
+var handlebarsOptions = {
+  viewEngine: 'handlebars',
+  viewPath: path.resolve('./api/templates/'),
+  extName: '.html'
+};
+
+smtpTransport.use('compile', hbs(handlebarsOptions));
+
+
+
 var transporter = nodemailer.createTransport({
 	service: 'gmail',
 	auth: {
@@ -35,62 +58,18 @@ app.use(bodyParser.json());
 app.get('/', function(request, response) {
 	response.sendFile(path.join(__dirname + '/register.html'));
 });
-app.post('/login', function(request, response) {
-	response.sendFile(path.join(__dirname + '/login.html'));
-});
 app.get('/forgot-password', function(request, response) {
 	response.sendFile(path.join(__dirname + '/forgot-password.html'));
 });
-app.get('/reset', function(request, response) {
-	response.sendFile(path.join(__dirname + '/reset-password.html'));
-});
-app.post('/update-password', function(request, response) {
-	var otp=request.body.otp;
-	var password=request.body.password;
-	var  sql = "SELECT email FROM my_otp WHERE otp = '"+otp+"'";
-	connection.query(sql, function (err, results,fields) {  
-		if (results.length > 0) {
-			email=results[0].email;
-			var  sql = "UPDATE USERS set PASSWORD='"+password+"' where EMAIL='"+email+"'";
-			connection.query(sql, function (err, results,fields) {  
-			if (results.length > 0) {
-				email=results[0].email;
-			} 
-			else {
-				response.send("Incorrect OTP.");
-			}
-			response.end();
-			});  
-		} 
-		else {
-			response.send("Incorrect OTP.");
-		}
-		response.end();
-	});  
-});
 app.post('/reset-password', function(request, response) {
 	var email = request.body.email;
-	var digits='0123456789';
-	let otp='';
-	for(let i=0;i<6;i++){
-		otp+=digits[Math.floor(Math.random()*10)];
-	}
-	sql = "DELETE FROM my_otp where email ='"+email+"'";  
-	connection.query(sql, function (err, result) {  
-	if (err) throw err;  
-	console.log("Record deleted.");  
-	});
-	sql = "INSERT INTO my_otp (EMAIL,OTP) VALUES ('"+email+"','"+otp+"')";  
-	connection.query(sql, function (err, result) {  
-	if (err) throw err;  
-	console.log("1 record inserted.");  
-	});  
-
+	token = crypto.randomBytes(32).toString('hex');
+	console.log(token);
 	const mailOptions = {
 		from: 'graphgenerator2020@gmail.com', // sender address
 		to: email, // list of receivers
-		subject: 'Your password reset link.  ', // Subject line
-		text: 'http://localhost:3000/password/'+email+'     Please use the otp: '+otp+' to reset the password.'// plain text body
+		subject: 'Your password reset link.', // Subject line
+		html: '<p>http://localhost:3000/</p>{{token}}'// plain text body
 	  };
 	  transporter.sendMail(mailOptions, function (err, info) {
 		if(err)
@@ -98,10 +77,8 @@ app.post('/reset-password', function(request, response) {
 		else
 		  console.log(info);
 	 });
-	 response.redirect('/reset');
 	 response.end();
 });
-
 app.post('/register-user', function(request, response) {
 	var email = request.body.email;
 	var username = request.body.username;
@@ -126,7 +103,7 @@ app.post('/register-user', function(request, response) {
 		response.end();
 		});  
 	
-	response.sendFile(path.join(__dirname + '/login.html'));
+	//response.sendFile(path.join(__dirname + '/login.html'));
 });
 app.get('/login', function(request, response) {
 	response.sendFile(path.join(__dirname + '/login.html'));
@@ -134,13 +111,6 @@ app.get('/login', function(request, response) {
 app.get('/mycss', function(request, response) {
 	response.sendFile(path.join(__dirname + '/login.css'));
 });
-app.get('/logo', function(request, response) {
-	response.sendFile(path.join(__dirname + '/logo1.png'));
-});
-app.get('/person', function(request, response) {
-	response.sendFile(path.join(__dirname + '/person.png'));
-});
-//For authentication of users
 app.post('/auth', function(request, response) {
 	var username = request.body.username;
 	var password = request.body.password;
@@ -160,11 +130,10 @@ app.post('/auth', function(request, response) {
 		response.end();
 	}
 });
-//When user successfully login
+
 app.get('/home', function(request, response) {
 	if (request.session.loggedin) {
-		//response.send('Welcome back, ' + request.session.username + '!');
-		response.redirect('http://localhost:7777/D3/BarChart/html3.html');
+		response.send('Welcome back, ' + request.session.username + '!');
 	} else {
 		response.send('Please login to view this page!');
 	}
