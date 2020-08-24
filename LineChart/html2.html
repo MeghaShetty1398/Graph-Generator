@@ -11,8 +11,8 @@
 <style> /* set the CSS */
 .line {
   fill: none;
-  stroke: steelblue;
-  stroke-width: 2px;
+  stroke: black;
+  stroke-width: 5px;
 }
 h1{
   margin-left: 40%;
@@ -56,7 +56,7 @@ $(document).ready(function(){
   d3.select('#saveButton').on('click', function(){
     var svg=d3.select("svg");
   var svgString = getSVGString(svg.node());
-	svgString2Image( svgString, 2*700, 2*700, 'png', save ); // passes Blob and filesize String to the callback
+	svgString2Image( svgString, 2*500, 2*500, 'png', save ); // passes Blob and filesize String to the callback
 
 	function save( dataBlob, filesize ){
 		saveAs( dataBlob, 'D3 vis exported to PNG.png' ); // FileSaver.js function
