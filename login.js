@@ -162,4 +162,16 @@ app.get('/home', function(request, response) {
 	}
 	response.end();
 });
+
+
+//All graph
+//1.Line Chart
+app.get('/line_chart', function(request, response) {
+	response.sendFile(path.join(__dirname + '/LineChart/html2.html'));
+});
+app.get('/line_data/:fileName', function(req, response) {
+	console.log(req.params.fileName);
+	response.sendFile(path.join(__dirname + '/LineChart/'+req.params.fileName));
+});
+
 app.listen(3000);
