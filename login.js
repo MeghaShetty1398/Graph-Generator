@@ -169,9 +169,23 @@ app.get('/home', function(request, response) {
 app.get('/line_chart', function(request, response) {
 	response.sendFile(path.join(__dirname + '/LineChart/html2.html'));
 });
+app.get('/pie_chart', function(request, response) {
+	response.sendFile(path.join(__dirname + '/PieChart/html1.html'));
+});
+app.get('/doughnut_chart', function(request, response) {
+	response.sendFile(path.join(__dirname + '/DoughnutChart/html1.html'));
+});
 app.get('/line_data/:fileName', function(req, response) {
 	console.log(req.params.fileName);
 	response.sendFile(path.join(__dirname + '/LineChart/'+req.params.fileName));
+});
+app.get('/pie_data/:fileName', function(req, response) {
+	console.log(req.params.fileName);
+	response.sendFile(path.join(__dirname + '/PieChart/'+req.params.fileName));
+});
+app.get('/doughnut_data/:fileName', function(req, response) {
+	console.log(req.params.fileName);
+	response.sendFile(path.join(__dirname + '/DoughnutChart/'+req.params.fileName));
 });
 
 app.listen(3000);
