@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -11,10 +11,9 @@
 <script src="jquery-3.5.1.min.js"></script>
     <style>
         .arc text {
-            font: 10px sans-serif;
+            font: 13px sans-serif;
             text-anchor: middle;
         }
-
         .arc path {
             stroke: #fff;
         }
@@ -67,24 +66,24 @@ svg{
             }
             });
             $("#file_url").change(function(){
-    var file_url=document.getElementById("file_url").value;
-    if(filetype=="json"){
-              // Get the data
-              d3.json(file_url, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                draw(data);
-               });
-            }
-            else{
-              // Get the data
-              d3.csv(file_url, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                draw(data);
-               });
-            }
-  });
+                var file_url=document.getElementById("file_url").value;
+                if(filetype=="json"){
+                    // Get the data
+                    d3.json(file_url, function(error, data) {
+                    if (error) throw error;
+                        // trigger render
+                        draw(data);
+                    });
+                }
+                else{
+                    // Get the data
+                    d3.csv(file_url, function(error, data) {
+                    if (error) throw error;
+                        // trigger render
+                        draw(data);
+                    });
+                }
+            });
 
             d3.select('#saveButton').on('click', function(){
                 var svg=d3.select("svg");
@@ -271,8 +270,8 @@ svg{
             .attr("transform", function(d) { 
                 return "translate(" + label.centroid(d) + ")"; 
             })
-            .text(function(d) { return d.data[k[0]]+":"+d.data[k[1]] })
-            svg.append("g")
+            .html(function(d) { return  d.data[k[0]]+" : "+ d.data[k[1]]; })
+        svg.append("g")
             .attr("transform", "translate(" + (width / 2 - 20) + "," + 10 + ")")
             .append("text")
             .text("")

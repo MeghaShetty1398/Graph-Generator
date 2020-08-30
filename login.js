@@ -175,6 +175,12 @@ app.get('/pie_chart', function(request, response) {
 app.get('/doughnut_chart', function(request, response) {
 	response.sendFile(path.join(__dirname + '/DoughnutChart/html1.html'));
 });
+app.get('/bar_chart', function(request, response) {
+	response.sendFile(path.join(__dirname + '/BarChart/html1.html'));
+});
+
+
+
 app.get('/line_data/:fileName', function(req, response) {
 	console.log(req.params.fileName);
 	response.sendFile(path.join(__dirname + '/LineChart/'+req.params.fileName));
@@ -186,6 +192,10 @@ app.get('/pie_data/:fileName', function(req, response) {
 app.get('/doughnut_data/:fileName', function(req, response) {
 	console.log(req.params.fileName);
 	response.sendFile(path.join(__dirname + '/DoughnutChart/'+req.params.fileName));
+});
+app.get('/barchart_data/:fileName', function(req, response) {
+	console.log(req.params.fileName);
+	response.sendFile(path.join(__dirname + '/BarChart/'+req.params.fileName));
 });
 
 app.listen(3000);

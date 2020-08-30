@@ -1,147 +1,135 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"></script>
-	 <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
+<script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
 <script src="jquery-3.5.1.min.js"></script>
-    <style>
-        .arc text {
-            font: 10px sans-serif;
-            text-anchor: middle;
-        }
-
-        .arc path {
-            stroke: #fff;
-        }
-
-        .title {
-            fill: teal;
-            font-weight: bold;
-        }
-        h1{
-  margin-left: 40%;
-}
-b{
-  margin-left: 27%;
-  color:black;
-}
-.card-body{
-  margin-left: 40%;
-}
-#dropdownList{
-  width:100px;
-  height: 30px;
-}
-svg{
-    margin-left: 20%;
-}
-    </style>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            $("#myFile").change(function(e){
+<style>
+    .arc text {
+        font: 15px sans-serif;
+        text-anchor: middle;
+    }
+    .arc path {
+        stroke: #fff;
+    }
+    .title {
+        fill: teal;
+        font-weight: bold;
+    }
+    h1{
+        margin-left: 40%;
+    }
+    b{
+        margin-left: 27%;
+        color:black;
+    }   
+    .card-body{
+        margin-left: 40%;
+    }
+    #dropdownList{
+         width:100px;
+         height: 30px;
+    }
+    svg{
+        margin-left: 20%;
+    }
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#myFile").change(function(e){
             var fileName = e.target.files[0].name;
             var filetype=document.getElementById("filetype").value;
             if(filetype=="json"){
               // Get the data
-              d3.json("http://localhost:3000/pie_data/"+fileName, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                alert(fileName);
-            alert(filetype);
-                draw(data);
-               });
+                d3.json("http://localhost:3000/pie_data/"+fileName, function(error, data) {
+                if (error) throw error;
+                    // trigger render
+                    draw(data);
+                });
             }
             else{
               // Get the data
-              d3.csv("http://localhost:3000/pie_data/"+fileName, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                draw(data);
+                d3.csv("http://localhost:3000/pie_data/"+fileName, function(error, data) {
+                if (error) throw error;
+                    // trigger render
+                    draw(data);
                });
             }
-            });
-            $("#file_url").change(function(){
-    var file_url=document.getElementById("file_url").value;
-    if(filetype=="json"){
-              // Get the data
-              d3.json(file_url, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                draw(data);
-               });
-            }
-            else{
-              // Get the data
-              d3.csv(file_url, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                draw(data);
-               });
-            }
-  });
-
-            d3.select('#saveButton').on('click', function(){
-                var svg=d3.select("svg");
-                var svgString = getSVGString(svg.node());
-	            svgString2Image( svgString, 900, 700, 'png', save ); // passes Blob and filesize String to the callback
-
-	            function save( dataBlob, filesize ){
-		            saveAs( dataBlob, 'Pie Chart from D3' ); // FileSaver.js function
-	            }
-            });
         });
-    </script>
-    <script>
-        // Set-up the export button
+        $("#file_url").change(function(){
+            var file_url=document.getElementById("file_url").value;
+            if(filetype=="json"){
+                // Get the data
+                d3.json(file_url, function(error, data) {
+                if (error) throw error;
+                    // trigger render
+                    draw(data);
+                });
+            }
+            else{
+                // Get the data
+                d3.csv(file_url, function(error, data) {
+                if (error) throw error;
+                    // trigger render
+                    draw(data);
+               });
+            }
+        });
+        d3.select('#saveButton').on('click', function(){
+            var svg=d3.select("svg");
+            var svgString = getSVGString(svg.node());
+	        svgString2Image( svgString, 900, 700, 'png', save ); // passes Blob and filesize String to the callback
+
+	        function save( dataBlob, filesize ){
+		        saveAs( dataBlob, 'Pie Chart from D3' ); // FileSaver.js function
+	        }
+        });
+    });
+</script>
+<script>
+    // Set-up the export button
+    // Below are the functions that handle actual exporting:
+    // getSVGString ( svgNode ) and svgString2Image( svgString, width, height, format, callback )
+    function getSVGString( svgNode ) {
+        svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
+        var cssStyleText = getCSSStyles( svgNode );
+        appendCSS( cssStyleText, svgNode );
+        var serializer = new XMLSerializer();
+        var svgString = serializer.serializeToString(svgNode);
+        svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
+        svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
+        return svgString;
       
+        function getCSSStyles( parentElement ) {
+            var selectorTextArr = [];
       
-      // Below are the functions that handle actual exporting:
-      // getSVGString ( svgNode ) and svgString2Image( svgString, width, height, format, callback )
-      function getSVGString( svgNode ) {
-          svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
-          var cssStyleText = getCSSStyles( svgNode );
-          appendCSS( cssStyleText, svgNode );
-      
-          var serializer = new XMLSerializer();
-          var svgString = serializer.serializeToString(svgNode);
-          svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
-          svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
-      
-          return svgString;
-      
-          function getCSSStyles( parentElement ) {
-              var selectorTextArr = [];
-      
-              // Add Parent element Id and Classes to the list
-              selectorTextArr.push( '#'+parentElement.id );
-              for (var c = 0; c < parentElement.classList.length; c++)
-                      if ( !contains('.'+parentElement.classList[c], selectorTextArr) )
+            // Add Parent element Id and Classes to the list
+            selectorTextArr.push( '#'+parentElement.id );
+            for (var c = 0; c < parentElement.classList.length; c++)
+                if ( !contains('.'+parentElement.classList[c], selectorTextArr) )
                           selectorTextArr.push( '.'+parentElement.classList[c] );
       
-              // Add Children element Ids and Classes to the list
-              var nodes = parentElement.getElementsByTagName("*");
+            // Add Children element Ids and Classes to the list
+            var nodes = parentElement.getElementsByTagName("*");
               for (var i = 0; i < nodes.length; i++) {
                   var id = nodes[i].id;
                   if ( !contains('#'+id, selectorTextArr) )
                       selectorTextArr.push( '#'+id );
-      
                   var classes = nodes[i].classList;
                   for (var c = 0; c < classes.length; c++)
                       if ( !contains('.'+classes[c], selectorTextArr) )
                           selectorTextArr.push( '.'+classes[c] );
               }
-      
               // Extract CSS Rules
               var extractedCSSText = "";
               for (var i = 0; i < document.styleSheets.length; i++) {
-                  var s = document.styleSheets[i];
-                  
+                  var s = document.styleSheets[i]; 
                   try {
                       if(!s.cssRules) continue;
                   } catch( e ) {
@@ -155,8 +143,6 @@ svg{
                           extractedCSSText += cssRules[r].cssText;
                   }
               }
-              
-      
               return extractedCSSText;
       
               function contains(str,arr) {
@@ -202,29 +188,26 @@ svg{
           image.src = imgsrc;
       }
       
-      </script>
+</script>
 </head>
 <body>
     <h1>Pie Chart</h1>
-  <div class="card  text-white" style="background-color: #F7ADC7;">
+    <div class="card  text-white" style="background-color: #F7ADC7;">
     <div class="card-body">
-      Choose File type:
-      <select id="filetype">
-        <option value="json" selected>JSON</option>
-        <option value="csv">CSV</option>
-      </select><br>
+        Choose File type:
+        <select id="filetype">
+            <option value="json" selected>JSON</option>
+            <option value="csv">CSV</option>
+        </select><br>
     </div>
     <div style="margin-left: 25%;">
-      Upload your json/csv data:   <input type="file" id="myFile" onchange="onCreateGraph()">
-      <B style="margin-left:0%;">OR</B>
-      <input id="file_url" type="text" placeholder="URL" style="margin-left:6%;">
-    </div>
-      
-    
+        Upload your json/csv data:   <input type="file" id="myFile" onchange="onCreateGraph()">
+        <B style="margin-left:0%;">OR</B>
+        <input id="file_url" type="text" placeholder="URL" style="margin-left:6%;">
+    </div>    
     <b>* Please upload json/csv file with atleast two column.</b>
-    <b>* Second column must be number type.<button class="btn btn-success" id="saveButton"  style="margin-left:22%;" >Download Graph</button>
-</b><br>
-  </div>
+    <b>* Second column must be number type.<button class="btn btn-success" id="saveButton"  style="margin-left:22%;" >Download Graph</button></b><br>
+    </div>
     <svg width="800" height="600"></svg>
     <script>
     function draw(data){
@@ -271,20 +254,14 @@ svg{
             .attr("transform", function(d) { 
                 return "translate(" + label.centroid(d) + ")"; 
             })
-            .text(function(d) { return d.data[k[0]]; });
+            .attr("dy", ".55em")
+            .text(function(d) { return d.data[k[0]]+" : "+d.data[k[1]]; });
             svg.append("g")
             .attr("transform", "translate(" + (width / 2 - 20) + "," + 10 + ")")
             .append("text")
             .text("")
             .attr("class", "title")
-        }
-        // d3.csv("/pie_data", function(error, data) {
-        //     if (error) {
-        //         throw error;
-        //     }
-        //     draw(data);
-            
-        // });            
+        }           
     </script>
 </body>
 </html>
