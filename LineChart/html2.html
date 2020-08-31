@@ -5,8 +5,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"></script>
-	 <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
+<script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
 <script src="jquery-3.5.1.min.js"></script>
 <style> /* set the CSS */
 .line {
@@ -28,6 +29,9 @@ b{
   width:100px;
   height: 30px;
 }
+text{
+  font-size: 15px;
+}
 </style>
 <!-- load the d3.js library -->    	
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -36,32 +40,37 @@ $(document).ready(function(){
   $("#myFile").change(function(e){
             var fileName = e.target.files[0].name;
             var filetype=document.getElementById("filetype").value;
-            if(filetype=="json"){
-              // Get the data
-              d3.json("http://localhost:3000/line_data/"+fileName, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                draw(data);
-               });
+            uploaded_filetype=document.getElementById("myFile").value.split('.')[1];
+            if(filetype===uploaded_filetype)
+            {
+                if(filetype=="json"){
+                    // Get the data
+                    d3.json("http://localhost:3000/line_data/"+fileName, function(error, data) {
+                    if (error) throw error;
+                        // trigger render
+                    draw(data);
+                    });
+                }
+                else{
+                    // Get the data
+                    d3.csv("http://localhost:3000/line_data/"+fileName, function(error, data) {
+                    if (error) throw error;
+                        // trigger render
+                        draw(data);
+                    });
+                }
             }
             else{
-              // Get the data
-              d3.csv("http://localhost:3000/line_data/"+fileName, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                draw(data);
-               });
+              swal({
+                icon: "warning",
+                title: "File Type Error",
+                text: "Uploaded file type is different file type selected.",
+                confirmButtonClass: "btn-danger"
+              });
+              document.getElementById("myFile").value="";
+              d3.select("svg").remove();
             }
-  });
-  d3.select('#saveButton').on('click', function(){
-    var svg=d3.select("svg");
-  var svgString = getSVGString(svg.node());
-	svgString2Image( svgString, 2*500, 2*500, 'png', save ); // passes Blob and filesize String to the callback
-
-	function save( dataBlob, filesize ){
-		saveAs( dataBlob, 'D3 vis exported to PNG.png' ); // FileSaver.js function
-	}
-});
+    });
   $("#file_url").change(function(){
     var file_url=document.getElementById("file_url").value;
     if(filetype=="json"){
@@ -81,6 +90,16 @@ $(document).ready(function(){
                });
             }
   })
+  d3.select('#saveButton').on('click', function(){
+    var svg=d3.select("svg");
+  var svgString = getSVGString(svg.node());
+	svgString2Image( svgString, 1000, 700, 'png', save ); // passes Blob and filesize String to the callback
+
+	function save( dataBlob, filesize ){
+		saveAs( dataBlob, 'Line chart using D3' ); // FileSaver.js function
+	}
+});
+  
 }); 
   
 function draw(data) {
@@ -95,8 +114,8 @@ function draw(data) {
   // alert(k[0]);
   // alert(k[1]);
   // set the dimensions and margins of the graph
-  var margin = {top: 50, right: 20, bottom: 30, left: 50},
-    width = 1000 - margin.left - margin.right,
+  var margin = {top: 50, right: 20, bottom: 50, left: 200},
+    width = 1100 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
   // set the ranges
   var x = d3.scaleTime().range([0, width]);
@@ -144,11 +163,26 @@ function draw(data) {
   // Add the X Axis
   svg.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
-
+      .call(d3.axisBottom(x))
+      .append("text")
+      .attr("transform", "rotate(-0)")
+      .attr("x","40%")
+      .attr("y","7%")
+      .attr("stroke","#000000")
+      .attr("font-size","17px")
+      .text(k[0]);
   // Add the Y Axis
   svg.append("g")
-      .call(d3.axisLeft(y));
+      .call(d3.axisLeft(y))
+      .append("text")
+      .attr("transform", "rotate(-0)")
+      .attr("x","-4%")
+      .attr("y","10%")
+      .attr("stroke","#000000")
+      .attr("font-size","17px")
+      .attr("dx", ".5em")
+      .attr("dy", ".10em")
+      .text(k[1]);
   }
 
 </script>

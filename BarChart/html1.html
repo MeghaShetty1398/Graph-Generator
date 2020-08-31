@@ -5,8 +5,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"></script>
-	 <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
+<script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
 <script src="jquery-3.5.1.min.js"></script>
 <head>
 	<style>
@@ -23,6 +24,7 @@
 	.axis line {
 	  fill: none;
 	  stroke: #000;
+
 	}
   .tick text{
     font-size: 13px;
@@ -47,27 +49,40 @@ b{
       $("#myFile").change(function(e){
             var fileName = e.target.files[0].name;
             var filetype=document.getElementById("filetype").value;
-            if(filetype=="json"){
-              // Get the data
-              d3.json("http://localhost:3000/barchart_data/"+fileName, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                alert(fileName);
-            alert(filetype);
-                draw(data);
-               });
+            uploaded_filetype=document.getElementById("myFile").value.split('.')[1];
+            if(filetype===uploaded_filetype)
+            {
+                if(filetype=="json"){
+                  // Get the data
+                  d3.json("http://localhost:3000/barchart_data/"+fileName, function(error, data) {
+                  if (error) throw error;
+                    // trigger render
+                    draw(data);
+                });
+              }
+              else{
+                // Get the data
+                  d3.csv("http://localhost:3000/barchart_data/"+fileName, function(error, data) {
+                    if (error) throw error;
+                      // trigger render
+                      draw(data);
+                });
+              }
             }
             else{
-              // Get the data
-              d3.csv("http://localhost:3000/barchart_data/"+fileName, function(error, data) {
-              if (error) throw error;
-                // trigger render
-                draw(data);
-               });
-            }
-            });
+              d3.select("svg").remove();
+              swal({
+                icon: "warning",
+                title: "File Type Error",
+                text: "Uploaded file type is different file type selected.",
+                confirmButtonClass: "btn-danger"
+              });
+              document.getElementById("myFile").value="";
+            }      
+        });
             $("#file_url").change(function(){
                 var file_url=document.getElementById("file_url").value;
+                var filetype=document.getElementById("filetype").value;
                 if(filetype=="json"){
                     // Get the data
                     d3.json(file_url, function(error, data) {
@@ -89,7 +104,7 @@ b{
       d3.select('#saveButton').on('click', function(){
                 var svg=d3.select("svg");
                 var svgString = getSVGString(svg.node());
-	            svgString2Image( svgString, 1000, 700, 'png', save ); // passes Blob and filesize String to the callback
+	            svgString2Image( svgString, 1400, 1000, 'png', save ); // passes Blob and filesize String to the callback
 
 	            function save( dataBlob, filesize ){
 		            saveAs( dataBlob, 'Bar Chart from D3' ); // FileSaver.js function
@@ -207,7 +222,7 @@ b{
 <body>
   <h1>Bar Chart</h1>
   <div class="card" style="background-color: #FBE4EC;color: #860331;">
-    <div class="card-body">
+    <div class="card-body" style="margin-left: 45%;">
       Choose File type:
       <select id="filetype">
         <option value="json" selected>JSON</option>
